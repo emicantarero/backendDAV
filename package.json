@@ -11,6 +11,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@google-cloud/dialogflow-cx": "^4.9.0",
+    "@google-cloud/language": "^6.5.0",
     "@google-cloud/local-auth": "^2.1.0",
     "@google-cloud/vertexai": "^1.9.0",
     "bcrypt": "^5.1.1",
