@@ -10,7 +10,6 @@ const {VertexAI} = require('@google-cloud/vertexai');
 const { SessionsClient } = require("@google-cloud/dialogflow-cx");
 const { LanguageServiceClient } = require("@google-cloud/language");
 // Initialize Vertex with your Cloud project and location
-const vertex_ai = new VertexAI({project: 'desarrollo-443721', location: 'us-central1'});
 
 const projectId = "desarrollo-443721";
 const locationId = "global";
@@ -121,6 +120,64 @@ app.post("/webhook", async (req, res) => {
       fulfillmentText: result.responseMessages[0]?.text?.text[0] || "",
     };
   }
+
+  app.post("/analyze-sentiment", async (req, res) => {
+    try {
+      const { messages } = req.body;
+  
+      if (!messages || !Array.isArray(messages)) {
+        return res
+          .status(400)
+          .json({ error: 'Se requiere un arreglo de "messages".' });
+      }
+  
+      let positiveCount = 0;
+      let negativeCount = 0;
+      let neutralCount = 0;
+  
+      // Procesar cada mensaje
+      for (const message of messages) {
+        const document = {
+          content: message,
+          type: "PLAIN_TEXT",
+        };
+  
+        const [result] = await languageClient.analyzeSentiment({ document });
+        const sentiment = result.documentSentiment;
+        const { score } = sentiment;
+  
+        if (score > 0.1) {
+          positiveCount++;
+        } else if (score < -0.1) {
+          negativeCount++;
+        } else {
+          neutralCount++;
+        }
+      }
+  
+      const totalMessages = messages.length;
+  
+      const positivePercentage = ((positiveCount / totalMessages) * 100).toFixed(
+        2
+      );
+      const negativePercentage = ((negativeCount / totalMessages) * 100).toFixed(
+        2
+      );
+      const neutralPercentage = ((neutralCount / totalMessages) * 100).toFixed(2);
+  
+      // Enviar el resumen de los resultados
+      res.json({
+        positivePercentage,
+        negativePercentage,
+        neutralPercentage,
+        totalMessages,
+      });
+    } catch (error) {
+      console.error("Error al analizar los mensajes:", error);
+      res.status(500).json({ error: "Error al analizar los mensajes." });
+    }
+  });
+  
 
 app.post("/registrar", async (req, res) => {
     try {
