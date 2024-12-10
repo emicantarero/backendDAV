@@ -1,0 +1,25 @@
+{
+  "name": "backenddav",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "test": "",
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@google-cloud/local-auth": "^2.1.0",
+    "@google-cloud/vertexai": "^1.9.0",
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "express": "^4.21.1",
+    "firebase": "^11.0.2",
+    "googleapis": "^105.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.11.0"
+  }
+}
