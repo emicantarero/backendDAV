@@ -91,7 +91,7 @@ app.post("/webhook", async (req, res) => {
       });
     } catch (error) {
       console.error("Error en el webhook de Dialogflow:", error);
-      res.status(500).send("Error en el servidor");
+      res.status(500).send(`Error en el servidor ${error}`);
     }
   });
   
