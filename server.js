@@ -18,7 +18,7 @@ const agentId = "f0333490-b73f-4f43-99ee-44d4a150053d";
 //const { initializeApp } = require ("firebase/app");
 app.use(express.json());
 app.use(cors({
-    origin: 'http://localhost:3002'  
+  origin: '*'  // Esto permitirá solicitudes de cualquier origen
 }));
 
 var urlEncodeParser = bodyParser.urlencoded({extended: true});
