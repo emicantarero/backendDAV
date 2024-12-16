@@ -221,37 +221,54 @@ app.post("/registrar", async (req, res) => {
 });
 
 app.post("/iniciarSesion", async (req, res) => {
-    try{
-        const database = client.db("DAV");
-        const usuarios = database.collection("Usuarios");
-        const camposTexto = ['email', 'password', ];
-        for (const campo of camposTexto) {
-            if (
-                !req.body[campo] ||
-                req.body[campo] === "" ||
-                req.body[campo] === undefined
-            ) {
-                return res
-                    .status(400)
-                    .send(`El campo ${campo} es requerido`);
-            }
-        }
-        const usuarioExistente = await usuarios.findOne({email: req.body.email});
-        if (usuarioExistente.nUsuario != null){
-            const compararPassword = await bcrypt.compare(req.body.password, usuarioExistente.password);   
-            if(compararPassword){
-                const token = generateToken(usuarioExistente);
-                console.log(token);
-                return res.status(200).send("Inicio de sesión exitoso");    
-            }else{
-                return res.status(400).send("Las credenciales ingresadas no coinciden");
-            }
-        }else{
-            return res.status(404).send("Usuario no encontrado");
-        }
-    }catch(error){
+  try {
+      const database = client.db("DAV");
+      const usuarios = database.collection("Usuarios");
+      const camposTexto = ['email', 'password'];
 
-    }
+      // Verificar si los campos están presentes en el cuerpo de la solicitud
+      for (const campo of camposTexto) {
+          if (
+              !req.body[campo] ||
+              req.body[campo] === "" ||
+              req.body[campo] === undefined
+          ) {
+              return res
+                  .status(400)
+                  .send(`El campo ${campo} es requerido`);
+          }
+      }
+
+      // Buscar usuario por email
+      const usuarioExistente = await usuarios.findOne({ email: req.body.email });
+      
+      if (usuarioExistente) {
+          // Comparar la contraseña encriptada con la proporcionada
+          const compararPassword = await bcrypt.compare(req.body.password, usuarioExistente.password);
+          
+          if (compararPassword) {
+              // Generar un token para el usuario (asumiendo que tienes una función generateToken)
+              const token = generateToken(usuarioExistente);
+
+              // Eliminar la contraseña del objeto del usuario para no enviarla en la respuesta
+              const { password, ...usuarioSinPassword } = usuarioExistente;
+
+              // Retornar el usuario sin la contraseña junto con el token
+              return res.status(200).json({
+                  message: "Inicio de sesión exitoso",
+                  user: usuarioSinPassword,  // Aquí se retorna el usuario sin la contraseña
+              });
+
+          } else {
+              return res.status(400).send("Las credenciales ingresadas no coinciden");
+          }
+      } else {
+          return res.status(404).send("Usuario no encontrado");
+      }
+  } catch (error) {
+      console.error(error);
+      return res.status(500).send("Error interno del servidor");
+  }
 });
 
 process.on("SIGINT", async () => {
